@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="stylesheet" href="css/icomoon.css">
+    <style>
+        body {
+            max-width:1200px; 
+            margin: 5px auto;
+            font-family: Arial, sans-serif;
+        }
+        .method {
+            margin-top: 20px;
+        }
+        .cf {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .box1 {
+            align-items: center;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .box1:hover {
+            background-color: #f5f5f5;
+        }
+        .box1 i {
+            font-size: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            max-width: 500px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .icon-preview {
+            font-size: 50px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h3>Icons</h3>
+    <div class="method">
+        <div class="cf" id="icons-container">
+            <!-- Icons will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Modal Popup -->
+    <div id="iconModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="icon-preview" id="modalIcon"></div>
+            <h3 id="iconName"></h3>
+            <p>Class: <code id="iconClass"></code></p>
+            <p>Unicode: <code id="iconUnicode"></code></p>
+        </div>
+    </div>
+
+    <script>
+        // Array of all icon classes from icomoon.css
+        const iconClasses = [
+            'i-A-Z', 'i-Aa', 'i-Add-Bag', 'i-Add-Basket', 'i-Add-Cart', 'i-Add-File', 
+            'i-Add-SpaceAfterParagraph', 'i-Add-SpaceBeforeParagraph', 'i-Add-User', 
+            'i-Add-UserStar', 'i-Add-Window', 'i-Add', 'i-Address-Book', 'i-Address-Book2',
+            'i-Administrator', 'i-Aerobics-2', 'i-Aerobics-3', 'i-Aerobics', 'i-Affiliate',
+            'i-Aim', 'i-Air-Balloon', 'i-Airbrush', 'i-Airship', 'i-Alarm-Clock',
+            'i-Alarm-Clock2', 'i-Alarm', 'i-Alien-2', 'i-Alien', 'i-Aligator',
+            'i-Align-Center', 'i-Align-JustifyAll', 'i-Align-JustifyCenter', 'i-Align-JustifyLeft',
+            'i-Align-JustifyRight', 'i-Align-Left', 'i-Align-Right', 'i-Alpha', 'i-Ambulance',
+            'i-AMX', 'i-Anchor-2', 'i-Anchor', 'i-Android-Store', 'i-Android', 'i-Angel-Smiley',
+            'i-Angel', 'i-Angry', 'i-Apple-Bite', 'i-Apple-Store', 'i-Apple', 'i-Approved-Window',
+            'i-Aquarius-2', 'i-Aquarius', 'i-Archery-2', 'i-Archery', 'i-Argentina', 'i-Aries-2',
+            'i-Aries', 'i-Army-Key', 'i-Arrow-Around', 'i-Arrow-Back3', 'i-Arrow-Back',
+            'i-Arrow-Back2', 'i-Arrow-Barrier', 'i-Arrow-Circle', 'i-Arrow-Cross', 'i-Arrow-Down',
+            'i-Arrow-Down2', 'i-Arrow-Down3', 'i-Arrow-DowninCircle', 'i-Arrow-Fork',
+            'i-Arrow-Forward', 'i-Arrow-Forward2', 'i-Arrow-From', 'i-Arrow-Inside',
+            'i-Arrow-Inside45', 'i-Arrow-InsideGap', 'i-Arrow-InsideGap45', 'i-Arrow-Into',
+            'i-Arrow-Join', 'i-Arrow-Junction', 'i-Arrow-Left', 'i-Arrow-Left2',
+            'i-Arrow-LeftinCircle', 'i-Arrow-Loop', 'i-Arrow-Merge', 'i-Arrow-Mix',
+            'i-Arrow-Next', 'i-Arrow-OutLeft', 'i-Arrow-OutRight', 'i-Arrow-Outside',
+            'i-Arrow-Outside45', 'i-Arrow-OutsideGap', 'i-Arrow-OutsideGap45', 'i-Arrow-Over',
+            'i-Arrow-Refresh', 'i-Arrow-Refresh2', 'i-Arrow-Right', 'i-Arrow-Right2',
+            'i-Arrow-RightinCircle', 'i-Arrow-Shuffle', 'i-Arrow-Squiggly', 'i-Arrow-Through',
+            'i-Arrow-To', 'i-Arrow-TurnLeft', 'i-Arrow-TurnRight', 'i-Arrow-Up', 'i-Arrow-Up2',
+            'i-Arrow-Up3', 'i-Arrow-UpinCircle', 'i-Arrow-XLeft', 'i-Arrow-XRight', 'i-Ask',
+            'i-Assistant', 'i-Astronaut', 'i-At-Sign', 'i-ATM', 'i-Atom', 'i-Audio',
+            'i-Auto-Flash', 'i-Autumn', 'i-Baby-Clothes', 'i-Baby-Clothes2', 'i-Baby-Cry',
+            'i-Baby', 'i-Back2', 'i-Back-Media', 'i-Back-Music', 'i-Back', 'i-Background',
+            'i-Bacteria', 'i-Bag-Coins', 'i-Bag-Items', 'i-Bag-Quantity', 'i-Bag', 'i-Bakelite',
+            'i-Ballet-Shoes', 'i-Balloon', 'i-Banana', 'i-Band-Aid', 'i-Bank', 'i-Bar-Chart',
+            'i-Bar-Chart2', 'i-Bar-Chart3', 'i-Bar-Chart4', 'i-Bar-Chart5', 'i-Bar-Code',
+            'i-Barricade-2', 'i-Barricade', 'i-Baseball', 'i-Basket-Ball', 'i-Basket-Coins',
+            'i-Basket-Items', 'i-Basket-Quantity', 'i-Bat-2', 'i-Bat', 'i-Bathrobe',
+            'i-Batman-Mask', 'i-Battery-0', 'i-Battery-25', 'i-Battery-50', 'i-Battery-75',
+            'i-Battery-100', 'i-Battery-Charge', 'i-Bear', 'i-Beard-2', 'i-Beard-3', 'i-Beard',
+            'i-Bebo', 'i-Bee', 'i-Beer-Glass', 'i-Beer', 'i-Bell-2', 'i-Bell', 'i-Belt-2',
+            'i-Belt-3', 'i-Belt', 'i-Berlin-Tower', 'i-Beta', 'i-Betvibes', 'i-Bicycle-2',
+            'i-Bicycle-3', 'i-Bicycle', 'i-Big-Bang', 'i-Big-Data', 'i-Bike-Helmet', 'i-Bikini',
+            'i-Bilk-Bottle2', 'i-Billing', 'i-Bing', 'i-Binocular', 'i-Bio-Hazard', 'i-Biotech',
+            'i-Bird-DeliveringLetter', 'i-Bird', 'i-Birthday-Cake', 'i-Bisexual', 'i-Bishop',
+            'i-Bitcoin', 'i-Black-Cat', 'i-Blackboard', 'i-Blinklist', 'i-Block-Cloud',
+            'i-Block-Window', 'i-Blogger', 'i-Blood', 'i-Blouse', 'i-Blueprint', 'i-Board',
+            'i-Bodybuilding', 'i-Bold-Text', 'i-Bone', 'i-Bones', 'i-Book', 'i-Bookmark',
+            'i-Books-2', 'i-Books', 'i-Boom', 'i-Boot-2', 'i-Boot', 'i-Bottom-ToTop',
+            'i-Bow-2', 'i-Bow-3', 'i-Bow-4', 'i-Bow-5', 'i-Bow-6', 'i-Bow', 'i-Bowling-2',
+            'i-Bowling', 'i-Box2', 'i-Box-Close', 'i-Box-Full', 'i-Box-Open',
+            'i-Box-withFolders', 'i-Box', 'i-Boy', 'i-Bra', 'i-Brain-2', 'i-Brain-3', 'i-Brain',
+            'i-Brazil', 'i-Bread-2', 'i-Bread', 'i-Bridge', 'i-Brightkite', 'i-Broke-Link2',
+            'i-Broken-Link', 'i-Broom', 'i-Brush', 'i-Bucket', 'i-Bug', 'i-Building',
+            'i-Bulleted-List', 'i-Bus-2', 'i-Bus', 'i-Business-Man', 'i-Business-ManWoman',
+            'i-Business-Mens', 'i-Business-Woman', 'i-Butterfly', 'i-Button', 'i-Cable-Car',
+            'i-Cake', 'i-Calculator-2', 'i-Calculator-3', 'i-Calculator', 'i-Calendar-2',
+            'i-Calendar-3', 'i-Calendar-4', 'i-Calendar-Clock', 'i-Calendar', 'i-Camel',
+            'i-Camera-2', 'i-Camera-3', 'i-Camera-4', 'i-Camera-5', 'i-Camera-Back', 'i-Camera',
+            'i-Can-2', 'i-Can', 'i-Canada', 'i-Cancer-2', 'i-Cancer-3', 'i-Cancer', 'i-Candle',
+            'i-Candy-Cane', 'i-Candy', 'i-Cannon', 'i-Cap-2', 'i-Cap-3', 'i-Cap-Smiley', 'i-Cap',
+            'i-Capricorn-2', 'i-Capricorn', 'i-Car-2', 'i-Car-3', 'i-Car-Coins', 'i-Car-Items',
+            'i-Car-Wheel', 'i-Car', 'i-Cardigan', 'i-Cardiovascular', 'i-Cart-Quantity',
+            'i-Casette-Tape', 'i-Cash-Register', 'i-Cash-register2', 'i-Castle', 'i-Cat',
+            'i-Cathedral', 'i-Cauldron', 'i-CD-2', 'i-CD-Cover', 'i-CD', 'i-Cello', 'i-Celsius',
+            'i-Chacked-Flag', 'i-Chair', 'i-Charger', 'i-Check-2', 'i-Check', 'i-Checked-User',
+            'i-Checkmate', 'i-Checkout-Bag', 'i-Checkout-Basket', 'i-Checkout', 'i-Cheese',
+            'i-Cheetah', 'i-Chef-Hat', 'i-Chef-Hat2', 'i-Chef', 'i-Chemical-2', 'i-Chemical-3',
+            'i-Chemical-4', 'i-Chemical-5', 'i-Chemical', 'i-Chess-Board', 'i-Chess', 'i-Chicken',
+            'i-Chile', 'i-Chimney', 'i-China', 'i-Chinese-Temple', 'i-Chip', 'i-Chopsticks-2',
+            'i-Chopsticks', 'i-Christmas-Ball', 'i-Christmas-Bell', 'i-Christmas-Candle',
+            'i-Christmas-Hat', 'i-Christmas-Sleigh', 'i-Christmas-Snowman', 'i-Christmas-Sock',
+            'i-Christmas-Tree', 'i-Christmas', 'i-Chrome', 'i-Chrysler-Building', 'i-Cinema',
+            'i-Circular-Point', 'i-City-Hall', 'i-Clamp', 'i-Clapperboard-Close',
+            'i-Clapperboard-Open', 'i-Claps', 'i-Clef', 'i-Clinic', 'i-Clock-2', 'i-Clock-3',
+            'i-Clock-4', 'i-Clock-Back', 'i-Clock-Forward', 'i-Clock', 'i-Close-Window',
+            'i-Close', 'i-Clothing-Store', 'i-Cloud--', 'i-Cloud-', 'i-Cloud-Camera',
+            'i-Cloud-Computer', 'i-Cloud-Email', 'i-Cloud-Hail', 'i-Cloud-Laptop', 'i-Cloud-Lock',
+            'i-Cloud-Moon', 'i-Cloud-Music', 'i-Cloud-Picture', 'i-Cloud-Rain', 'i-Cloud-Remove',
+            'i-Cloud-Secure', 'i-Cloud-Settings', 'i-Cloud-Smartphone', 'i-Cloud-Snow',
+            'i-Cloud-Sun', 'i-Cloud-Tablet', 'i-Cloud-Video', 'i-Cloud-Weather', 'i-Cloud',
+            'i-Clouds-Weather', 'i-Clouds', 'i-Clown', 'i-CMYK', 'i-Coat', 'i-Cocktail',
+            'i-Coconut', 'i-Code-Window', 'i-Coding', 'i-Coffee-2', 'i-Coffee-Bean',
+            'i-Coffee-Machine', 'i-Coffee-toGo', 'i-Coffee', 'i-Coffin', 'i-Coin', 'i-Coins-2',
+            'i-Coins-3', 'i-Coins', 'i-Colombia', 'i-Colosseum', 'i-Column-2', 'i-Column-3',
+            'i-Column', 'i-Comb-2', 'i-Comb', 'i-Communication-Tower', 'i-Communication-Tower2',
+            'i-Compass-2', 'i-Compass-3', 'i-Compass-4', 'i-Compass-Rose', 'i-Compass',
+            'i-Computer-2', 'i-Computer-3', 'i-Computer-Secure', 'i-Computer', 'i-Conference',
+            'i-Confused', 'i-Conservation', 'i-Consulting', 'i-Contrast', 'i-Control-2',
+            'i-Control', 'i-Cookie-Man', 'i-Cookies', 'i-Cool-Guy', 'i-Cool', 'i-Copyright',
+            'i-Costume', 'i-Couple-Sign', 'i-Cow', 'i-CPU', 'i-Crane', 'i-Cranium',
+            'i-Credit-Card', 'i-Credit-Card2', 'i-Credit-Card3', 'i-Cricket', 'i-Criminal',
+            'i-Croissant', 'i-Crop-2', 'i-Crop-3', 'i-Crown-2', 'i-Crown', 'i-Crying',
+            'i-Cube-Molecule', 'i-Cube-Molecule2', 'i-Cupcake', 'i-Cursor-Click', 'i-Cursor-Click2',
+            'i-Cursor-Move', 'i-Cursor-Move2', 'i-Cursor-Select', 'i-Cursor', 'i-D-Eyeglasses',
+            'i-D-Eyeglasses2', 'i-Dam', 'i-Danemark', 'i-Danger-2', 'i-Danger', 'i-Dashboard',
+            'i-Data-Backup', 'i-Data-Block', 'i-Data-Center', 'i-Data-Clock', 'i-Data-Cloud',
+            'i-Data-Compress', 'i-Data-Copy', 'i-Data-Download', 'i-Data-Financial', 'i-Data-Key',
+            'i-Data-Lock', 'i-Data-Network', 'i-Data-Password', 'i-Data-Power', 'i-Data-Refresh',
+            'i-Data-Save', 'i-Data-Search', 'i-Data-Security', 'i-Data-Settings', 'i-Data-Sharing',
+            'i-Data-Shield', 'i-Data-Signal', 'i-Data-Storage', 'i-Data-Stream', 'i-Data-Transfer',
+            'i-Data-Unlock', 'i-Data-Upload', 'i-Data-Yes', 'i-Data', 'i-David-Star', 'i-Daylight',
+            'i-Death', 'i-Debian', 'i-Dec', 'i-Decrase-Inedit', 'i-Deer-2', 'i-Deer',
+            'i-Delete-File', 'i-Delete-Window', 'i-Delicious', 'i-Depression', 'i-Deviantart',
+            'i-Device-SyncwithCloud', 'i-Diamond', 'i-Dice-2', 'i-Dice', 'i-Digg',
+            'i-Digital-Drawing', 'i-Diigo', 'i-Dinosaur', 'i-Diploma-2', 'i-Diploma',
+            'i-Direction-East', 'i-Direction-North', 'i-Direction-South', 'i-Direction-West',
+            'i-Director', 'i-Disk', 'i-Dj', 'i-DNA-2', 'i-DNA-Helix', 'i-DNA', 'i-Doctor',
+            'i-Dog', 'i-Dollar-Sign', 'i-Dollar-Sign2', 'i-Dollar', 'i-Dolphin', 'i-Domino',
+            'i-Door-Hanger', 'i-Door', 'i-Doplr', 'i-Double-Circle', 'i-Double-Tap', 'i-Doughnut',
+            'i-Dove', 'i-Down-2', 'i-Down-3', 'i-Down-4', 'i-Down', 'i-Download-2',
+            'i-Download-fromCloud', 'i-Download-Window', 'i-Download', 'i-Downward', 'i-Drag-Down',
+            'i-Drag-Left', 'i-Drag-Right', 'i-Drag-Up', 'i-Drag', 'i-Dress', 'i-Drill-2', 'i-Drill',
+            'i-Drop', 'i-Dropbox', 'i-Drum', 'i-Dry', 'i-Duck', 'i-Dumbbell', 'i-Duplicate-Layer',
+            'i-Duplicate-Window', 'i-DVD', 'i-Eagle', 'i-Ear', 'i-Earphones-2', 'i-Earphones',
+            'i-Eci-i', 'i-Edit-Map', 'i-Edit', 'i-Eggs', 'i-Egypt', 'i-Eifel-Tower', 'i-eject-2',
+            'i-Eject', 'i-El-Castillo', 'i-Elbow', 'i-Electric-Guitar', 'i-Electricity',
+            'i-Elephant', 'i-Email', 'i-Embassy', 'i-Empire-StateBuilding', 'i-Empty-Box', 'i-End2',
+            'i-End-2', 'i-End', 'i-Endways', 'i-Engineering', 'i-Envelope-2', 'i-Envelope',
+            'i-Environmental-2', 'i-Environmental-3', 'i-Environmental', 'i-Equalizer', 'i-Eraser-2',
+            'i-Eraser-3', 'i-Eraser', 'i-Error-404Window', 'i-Euro-Sign', 'i-Euro-Sign2', 'i-Euro',
+            'i-Evernote', 'i-Evil', 'i-Explode', 'i-Eye-2', 'i-Eye-Blind', 'i-Eye-Invisible',
+            'i-Eye-Scan', 'i-Eye-Visible', 'i-Eye', 'i-Eyebrow-2', 'i-Eyebrow-3', 'i-Eyebrow',
+            'i-Eyeglasses-Smiley', 'i-Eyeglasses-Smiley2', 'i-Face-Style', 'i-Face-Style2',
+            'i-Face-Style3', 'i-Face-Style4', 'i-Face-Style5', 'i-Face-Style6', 'i-Facebook-2',
+            'i-Facebook', 'i-Factory-2', 'i-Factory', 'i-Fahrenheit', 'i-Family-Sign', 'i-Fan',
+            'i-Farmer', 'i-Fashion', 'i-Favorite-Window', 'i-Fax', 'i-Feather', 'i-Feedburner',
+            'i-Female-2', 'i-Female-Sign', 'i-Female', 'i-FemaleFemale', 'i-File-Block',
+            'i-File-Bookmark', 'i-File-Chart', 'i-File-Clipboard', 'i-File-ClipboardFileText',
+            'i-File-ClipboardTextImage', 'i-File-Cloud', 'i-File-Copy', 'i-File-Copy2', 'i-File-CSV',
+            'i-File-Download', 'i-File-Edit', 'i-File-Excel', 'i-File-Favorite', 'i-File-Fire',
+            'i-File-Graph', 'i-File-Hide', 'i-File-Horizontal', 'i-File-HorizontalText', 'i-File-HTML',
+            'i-File-JPG', 'i-File-Link', 'i-File-Loading', 'i-File-Lock', 'i-File-Love', 'i-File-Music',
+            'i-File-Network', 'i-File-Pictures', 'i-File-Pie', 'i-File-Presentation', 'i-File-Refresh',
+            'i-File-Search', 'i-File-Settings', 'i-File-Share', 'i-File-TextImage', 'i-File-Trash',
+            'i-File-TXT', 'i-File-Upload', 'i-File-Video', 'i-File-Word', 'i-File-Zip', 'i-File',
+            'i-Files', 'i-Film-Board', 'i-Film-Cartridge', 'i-Film-Strip', 'i-Film-Video', 'i-Film',
+            'i-Filter-2', 'i-Filter', 'i-Financial', 'i-Find-User', 'i-Finger-DragFourSides',
+            'i-Finger-DragTwoSides', 'i-Finger-Print', 'i-Finger', 'i-Fingerprint-2', 'i-Fingerprint',
+            'i-Fire-Flame', 'i-Fire-Flame2', 'i-Fire-Hydrant', 'i-Fire-Staion', 'i-Firefox',
+            'i-Firewall', 'i-First-Aid', 'i-First', 'i-Fish-Food', 'i-Fish', 'i-Fit-To', 'i-Fit-To2',
+            'i-Five-Fingers', 'i-Five-FingersDrag', 'i-Five-FingersDrag2', 'i-Five-FingersTouch',
+            'i-Flag-2', 'i-Flag-3', 'i-Flag-4', 'i-Flag-5', 'i-Flag-6', 'i-Flag', 'i-Flamingo',
+            'i-Flash-2', 'i-Flash-Video', 'i-Flash', 'i-Flashlight', 'i-Flask-2', 'i-Flask', 'i-Flick',
+            'i-Flickr', 'i-Flowerpot', 'i-Fluorescent', 'i-Fog-Day', 'i-Fog-Night', 'i-Folder-Add',
+            'i-Folder-Archive', 'i-Folder-Binder', 'i-Folder-Binder2', 'i-Folder-Block',
+            'i-Folder-Bookmark', 'i-Folder-Close', 'i-Folder-Cloud', 'i-Folder-Delete',
+            'i-Folder-Download', 'i-Folder-Edit', 'i-Folder-Favorite', 'i-Folder-Fire', 'i-Folder-Hide',
+            'i-Folder-Link', 'i-Folder-Loading', 'i-Folder-Lock', 'i-Folder-Love', 'i-Folder-Music',
+            'i-Folder-Network', 'i-Folder-Open', 'i-Folder-Open2', 'i-Folder-Organizing',
+            'i-Folder-Pictures', 'i-Folder-Refresh', 'i-Folder-Remove-', 'i-Folder-Search',
+            'i-Folder-Settings', 'i-Folder-Share', 'i-Folder-Trash', 'i-Folder-Upload', 'i-Folder-Video',
+            'i-Folder-WithDocument', 'i-Folder-Zip', 'i-Folder', 'i-Folders', 'i-Font-Color',
+            'i-Font-Name', 'i-Font-Size', 'i-Font-Style', 'i-Font-StyleSubscript',
+            'i-Font-StyleSuperscript', 'i-Font-Window', 'i-Foot-2', 'i-Foot', 'i-Football-2',
+            'i-Football', 'i-Footprint-2', 'i-Footprint-3', 'i-Footprint', 'i-Forest', 'i-Fork',
+            'i-Formspring', 'i-Formula', 'i-Forsquare', 'i-Forward', 'i-Fountain-Pen', 'i-Four-Fingers',
+            'i-Four-FingersDrag', 'i-Four-FingersDrag2', 'i-Four-FingersTouch', 'i-Fox', 'i-Frankenstein',
+            'i-French-Fries', 'i-Friendfeed', 'i-Friendster', 'i-Frog', 'i-Fruits', 'i-Fuel',
+            'i-Full-Bag', 'i-Full-Basket', 'i-Full-Cart', 'i-Full-Moon', 'i-Full-Screen',
+            'i-Full-Screen2', 'i-Full-View', 'i-Full-View2', 'i-Full-ViewWindow', 'i-Function',
+            'i-Funky', 'i-Funny-Bicycle', 'i-Furl', 'i-Gamepad-2', 'i-Gamepad', 'i-Gas-Pump',
+            'i-Gaugage-2', 'i-Gaugage', 'i-Gay', 'i-Gear-2', 'i-Gear', 'i-Gears-2', 'i-Gears',
+            'i-Geek-2', 'i-Geek', 'i-Gemini-2', 'i-Gemini', 'i-Genius', 'i-Gentleman', 'i-Geo--',
+            'i-Geo-', 'i-Geo-Close', 'i-Geo-Love', 'i-Geo-Number', 'i-Geo-Star', 'i-Geo', 'i-Geo2--',
+            'i-Geo2-', 'i-Geo2-Close', 'i-Geo2-Love', 'i-Geo2-Number', 'i-Geo2-Star', 'i-Geo2',
+            'i-Geo3--', 'i-Geo3-', 'i-Geo3-Close', 'i-Geo3-Love', 'i-Geo3-Number', 'i-Geo3-Star',
+            'i-Geo3', 'i-Gey', 'i-Gift-Box', 'i-Giraffe', 'i-Girl', 'i-Glass-Water', 'i-Glasses-2',
+            'i-Glasses-3', 'i-Glasses', 'i-Global-Position', 'i-Globe-2', 'i-Globe', 'i-Gloves',
+            'i-Go-Bottom', 'i-Go-Top', 'i-Goggles', 'i-Golf-2', 'i-Golf', 'i-Google-Buzz',
+            'i-Google-Drive', 'i-Google-Play', 'i-Google-Plus', 'i-Google', 'i-Gopro', 'i-Gorilla',
+            'i-Gowalla', 'i-Grave', 'i-Graveyard', 'i-Greece', 'i-Green-Energy', 'i-Green-House',
+            'i-Guitar', 'i-Gun-2', 'i-Gun-3', 'i-Gun', 'i-Gymnastics', 'i-Hair-2', 'i-Hair-3',
+            'i-Hair-4', 'i-Hair', 'i-Half-Moon', 'i-Halloween-HalfMoon', 'i-Halloween-Moon',
+            'i-Hamburger', 'i-Hammer', 'i-Hand-Touch', 'i-Hand-Touch2', 'i-Hand-TouchSmartphone',
+            'i-Hand', 'i-Hands', 'i-Handshake', 'i-Hanger', 'i-Happy', 'i-Hat-2', 'i-Hat',
+            'i-Haunted-House', 'i-HD-Video', 'i-HD', 'i-HDD', 'i-Headphone', 'i-Headphones',
+            'i-Headset', 'i-Heart-2', 'i-Heart', 'i-Heels-2', 'i-Heels', 'i-Height-Window',
+            'i-Helicopter-2', 'i-Helicopter', 'i-Helix-2', 'i-Hello', 'i-Helmet-2', 'i-Helmet-3',
+            'i-Helmet', 'i-Hipo', 'i-Hipster-Glasses', 'i-Hipster-Glasses2', 'i-Hipster-Glasses3',
+            'i-Hipster-Headphones', 'i-Hipster-Men', 'i-Hipster-Men2', 'i-Hipster-Men3',
+            'i-Hipster-Sunglasses', 'i-Hipster-Sunglasses2', 'i-Hipster-Sunglasses3', 'i-Hokey',
+            'i-Holly', 'i-Home-2', 'i-Home-3', 'i-Home-4', 'i-Home-5', 'i-Home-Window', 'i-Home',
+            'i-Homosexual', 'i-Honey', 'i-Hong-Kong', 'i-Hoodie', 'i-Horror', 'i-Horse', 'i-Hospital-2',
+            'i-Hospital', 'i-Host', 'i-Hot-Dog', 'i-Hotel', 'i-Hour', 'i-Hub', 'i-Humor', 'i-Hurt',
+            'i-Ice-Cream', 'i-ICQ', 'i-ID-2', 'i-ID-3', 'i-ID-Card', 'i-Idea-2', 'i-Idea-3', 'i-Idea-4',
+            'i-Idea-5', 'i-Idea', 'i-Identification-Badge', 'i-ImDB', 'i-Inbox-Empty', 'i-Inbox-Forward',
+            'i-Inbox-Full', 'i-Inbox-Into', 'i-Inbox-Out', 'i-Inbox-Reply', 'i-Inbox', 'i-Increase-Inedit',
+            'i-Indent-FirstLine', 'i-Indent-LeftMargin', 'i-Indent-RightMargin', 'i-India',
+            'i-Info-Window', 'i-Information', 'i-Inifity', 'i-Instagram', 'i-Internet-2',
+            'i-Internet-Explorer', 'i-Internet-Smiley', 'i-Internet', 'i-iOS-Apple', 'i-Israel',
+            'i-Italic-Text', 'i-Jacket-2', 'i-Jacket', 'i-Jamaica', 'i-Japan', 'i-Japanese-Gate',
+            'i-Jeans', 'i-Jeep-2', 'i-Jeep', 'i-Jet', 'i-Joystick', 'i-Juice', 'i-Jump-Rope',
+            'i-Kangoroo', 'i-Kenya', 'i-Key-2', 'i-Key-3', 'i-Key-Lock', 'i-Key', 'i-Keyboard',
+            'i-Keyboard3', 'i-Keypad', 'i-King-2', 'i-King', 'i-Kiss', 'i-Knee', 'i-Knife-2', 'i-Knife',
+            'i-Knight', 'i-Koala', 'i-Korea', 'i-Lamp', 'i-Landscape-2', 'i-Landscape', 'i-Lantern',
+            'i-Laptop-2', 'i-Laptop-3', 'i-Laptop-Phone', 'i-Laptop-Secure', 'i-Laptop-Tablet',
+            'i-Laptop', 'i-Laser', 'i-Last-FM', 'i-Last', 'i-Laughing', 'i-Layer-1635', 'i-Layer-1646',
+            'i-Layer-Backward', 'i-Layer-Forward', 'i-Leafs-2', 'i-Leafs', 'i-Leaning-Tower',
+            'i-Left--Right', 'i-Left--Right3', 'i-Left-2', 'i-Left-3', 'i-Left-4', 'i-Left-ToRight',
+            'i-Left', 'i-Leg-2', 'i-Leg', 'i-Lego', 'i-Lemon', 'i-Len-2', 'i-Len-3', 'i-Len',
+            'i-Leo-2', 'i-Leo', 'i-Leopard', 'i-Lesbian', 'i-Lesbians', 'i-Letter-Close', 'i-Letter-Open',
+            'i-Letter-Sent', 'i-Libra-2', 'i-Libra', 'i-Library-2', 'i-Library', 'i-Life-Jacket',
+            'i-Life-Safer', 'i-Light-Bulb', 'i-Light-Bulb2', 'i-Light-BulbLeaf', 'i-Lighthouse',
+            'i-Like-2', 'i-Like', 'i-Line-Chart', 'i-Line-Chart2', 'i-Line-Chart3', 'i-Line-Chart4',
+            'i-Line-Spacing', 'i-Line-SpacingText', 'i-Link-2', 'i-Link', 'i-Linkedin-2', 'i-Linkedin',
+            'i-Linux', 'i-Lion', 'i-Livejournal', 'i-Loading-2', 'i-Loading-3', 'i-Loading-Window',
+            'i-Loading', 'i-Location-2', 'i-Location', 'i-Lock-2', 'i-Lock-3', 'i-Lock-User',
+            'i-Lock-Window', 'i-Lock', 'i-Lollipop-2', 'i-Lollipop-3', 'i-Lollipop', 'i-Loop', 'i-Loud',
+            'i-Loudspeaker', 'i-Love-2', 'i-Love-User', 'i-Love-Window', 'i-Love', 'i-Lowercase-Text',
+            'i-Luggafe-Front', 'i-Luggage-2', 'i-Macro', 'i-Magic-Wand', 'i-Magnet', 'i-Magnifi-Glass-',
+            'i-Magnifi-Glass', 'i-Magnifi-Glass2', 'i-Mail-2', 'i-Mail-3', 'i-Mail-Add', 'i-Mail-Attachement',
+            'i-Mail-Block', 'i-Mail-Delete', 'i-Mail-Favorite', 'i-Mail-Forward', 'i-Mail-Gallery',
+            'i-Mail-Inbox', 'i-Mail-Link', 'i-Mail-Lock', 'i-Mail-Love', 'i-Mail-Money', 'i-Mail-Open',
+            'i-Mail-Outbox', 'i-Mail-Password', 'i-Mail-Photo', 'i-Mail-Read', 'i-Mail-Removex',
+            'i-Mail-Reply', 'i-Mail-ReplyAll', 'i-Mail-Search', 'i-Mail-Send', 'i-Mail-Settings',
+            'i-Mail-Unread', 'i-Mail-Video', 'i-Mail-withAtSign', 'i-Mail-WithCursors', 'i-Mail',
+            'i-Mailbox-Empty', 'i-Mailbox-Full', 'i-Male-2', 'i-Male-Sign', 'i-Male', 'i-MaleFemale',
+            'i-Man-Sign', 'i-Management', 'i-Mans-Underwear', 'i-Mans-Underwear2', 'i-Map-Marker',
+            'i-Map-Marker2', 'i-Map-Marker3', 'i-Map', 'i-Map2', 'i-Marker-2', 'i-Marker-3', 'i-Marker',
+            'i-Martini-Glass', 'i-Mask', 'i-Master-Card', 'i-Maximize-Window', 'i-Maximize',
+            'i-Medal-2', 'i-Medal-3', 'i-Medal', 'i-Medical-Sign', 'i-Medicine-2', 'i-Medicine-3',
+            'i-Medicine', 'i-Megaphone', 'i-Memory-Card', 'i-Memory-Card2', 'i-Memory-Card3', 'i-Men',
+            'i-Menorah', 'i-Mens', 'i-Metacafe', 'i-Mexico', 'i-Mic', 'i-Microphone-2', 'i-Microphone-3',
+            'i-Microphone-4', 'i-Microphone-5', 'i-Microphone-6', 'i-Microphone-7', 'i-Microphone',
+            'i-Microscope', 'i-Milk-Bottle', 'i-Mine', 'i-Minimize-Maximize-Close-Window',
+            'i-Minimize-Window', 'i-Minimize', 'i-Mirror', 'i-Mixer', 'i-Mixx', 'i-Money-2',
+            'i-Money-Bag', 'i-Money-Smiley', 'i-Money', 'i-Monitor-2', 'i-Monitor-3', 'i-Monitor-4',
+            'i-Monitor-5', 'i-Monitor-Analytics', 'i-Monitor-Laptop', 'i-Monitor-phone',
+            'i-Monitor-Tablet', 'i-Monitor-Vertical', 'i-Monitor', 'i-Monitoring', 'i-Monkey',
+            'i-Monster', 'i-Morocco', 'i-Motorcycle', 'i-Mouse-2', 'i-Mouse-3', 'i-Mouse-4',
+            'i-Mouse-Pointer', 'i-Mouse', 'i-Moustache-Smiley', 'i-Movie-Ticket', 'i-Movie',
+            'i-Mp3-File', 'i-Museum', 'i-Mushroom', 'i-Music-Note', 'i-Music-Note2', 'i-Music-Note3',
+            'i-Music-Note4', 'i-Music-Player', 'i-Mustache-2', 'i-Mustache-3', 'i-Mustache-4',
+            'i-Mustache-5', 'i-Mustache-6', 'i-Mustache-7', 'i-Mustache-8', 'i-Mustache', 'i-Mute',
+            'i-Myspace', 'i-Navigat-Start', 'i-Navigate-End', 'i-Navigation-LeftWindow',
+            'i-Navigation-RightWindow', 'i-Nepal', 'i-Netscape', 'i-Network-Window', 'i-Network',
+            'i-Neutron', 'i-New-Mail', 'i-New-Tab', 'i-Newspaper-2', 'i-Newspaper', 'i-Newsvine',
+            'i-Next2', 'i-Next-3', 'i-Next-Music', 'i-Next', 'i-No-Battery', 'i-No-Drop', 'i-No-Flash',
+            'i-No-Smoking', 'i-Noose', 'i-Normal-Text', 'i-Note', 'i-Notepad-2', 'i-Notepad',
+            'i-Nuclear', 'i-Numbering-List', 'i-Nurse', 'i-Office-Lamp', 'i-Office', 'i-Oil',
+            'i-Old-Camera', 'i-Old-Cassette', 'i-Old-Clock', 'i-Old-Radio', 'i-Old-Sticky',
+            'i-Old-Sticky2', 'i-Old-Telephone', 'i-Old-TV', 'i-On-Air', 'i-On-Off-2', 'i-On-Off-3',
+            'i-On-off', 'i-One-Finger', 'i-One-FingerTouch', 'i-One-Window', 'i-Open-Banana',
+            'i-Open-Book', 'i-Opera-House', 'i-Opera', 'i-Optimization', 'i-Orientation-2',
+            'i-Orientation-3', 'i-Orientation', 'i-Orkut', 'i-Ornament', 'i-Over-Time', 'i-Over-Time2',
+            'i-Owl', 'i-Pac-Man', 'i-Paint-Brush', 'i-Paint-Bucket', 'i-Paintbrush', 'i-Palette',
+            'i-Palm-Tree', 'i-Panda', 'i-Panorama', 'i-Pantheon', 'i-Pantone', 'i-Pants',
+            'i-Paper-Plane', 'i-Paper', 'i-Parasailing', 'i-Parrot', 'i-Password-2shopping',
+            'i-Password-Field', 'i-Password-shopping', 'i-Password', 'i-pause-2', 'i-Pause', 'i-Paw',
+            'i-Pawn', 'i-Paypal', 'i-Pen-2', 'i-Pen-3', 'i-Pen-4', 'i-Pen-5', 'i-Pen-6', 'i-Pen',
+            'i-Pencil-Ruler', 'i-Pencil', 'i-Penguin', 'i-Pentagon', 'i-People-onCloud',
+            'i-Pepper-withFire', 'i-Pepper', 'i-Petrol', 'i-Petronas-Tower', 'i-Philipines',
+            'i-Phone-2', 'i-Phone-3', 'i-Phone-3G', 'i-Phone-4G', 'i-Phone-Simcard', 'i-Phone-SMS',
+            'i-Phone-Wifi', 'i-Phone', 'i-Photo-2', 'i-Photo-3', 'i-Photo-Album', 'i-Photo-Album2',
+            'i-Photo-Album3', 'i-Photo', 'i-Photos', 'i-Physics', 'i-Pi', 'i-Piano', 'i-Picasa',
+            'i-Pie-Chart', 'i-Pie-Chart2', 'i-Pie-Chart3', 'i-Pilates-2', 'i-Pilates-3', 'i-Pilates',
+            'i-Pilot', 'i-Pinch', 'i-Ping-Pong', 'i-Pinterest', 'i-Pipe', 'i-Pipette', 'i-Piramids',
+            'i-Pisces-2', 'i-Pisces', 'i-Pizza-Slice', 'i-Pizza', 'i-Plane-2', 'i-Plane', 'i-Plant',
+            'i-Plasmid', 'i-Plaster', 'i-Plastic-CupPhone', 'i-Plastic-CupPhone2', 'i-Plate',
+            'i-Plates', 'i-Plaxo', 'i-Play-Music', 'i-Plug-In', 'i-Plug-In2', 'i-Plurk', 'i-Pointer',
+            'i-Poland', 'i-Police-Man', 'i-Police-Station', 'i-Police-Woman', 'i-Police', 'i-Polo-Shirt',
+            'i-Portrait', 'i-Portugal', 'i-Post-Mail', 'i-Post-Mail2', 'i-Post-Office', 'i-Post-Sign',
+            'i-Post-Sign2ways', 'i-Posterous', 'i-Pound-Sign', 'i-Pound-Sign2', 'i-Pound', 'i-Power-2',
+            'i-Power-3', 'i-Power-Cable', 'i-Power-Station', 'i-Power', 'i-Prater', 'i-Present',
+            'i-Presents', 'i-Press', 'i-Preview', 'i-Previous', 'i-Pricing', 'i-Printer', 'i-Professor',
+            'i-Profile', 'i-Project', 'i-Projector-2', 'i-Projector', 'i-Pulse', 'i-Pumpkin', 'i-Punk',
+            'i-Punker', 'i-Puzzle', 'i-QIK', 'i-QR-Code', 'i-Queen-2', 'i-Queen', 'i-Quill-2',
+            'i-Quill-3', 'i-Quill', 'i-Quotes-2', 'i-Quotes', 'i-Radio', 'i-Radioactive', 'i-Rafting',
+            'i-Rain-Drop', 'i-Rainbow-2', 'i-Rainbow', 'i-Ram', 'i-Razzor-Blade', 'i-Receipt-2',
+            'i-Receipt-3', 'i-Receipt-4', 'i-Receipt', 'i-Record2', 'i-Record-3', 'i-Record-Music',
+            'i-Record', 'i-Recycling-2', 'i-Recycling', 'i-Reddit', 'i-Redhat', 'i-Redirect', 'i-Redo',
+            'i-Reel', 'i-Refinery', 'i-Refresh-Window', 'i-Refresh', 'i-Reload-2', 'i-Reload-3',
+            'i-Reload', 'i-Remote-Controll', 'i-Remote-Controll2', 'i-Remove-Bag', 'i-Remove-Basket',
+            'i-Remove-Cart', 'i-Remove-File', 'i-Remove-User', 'i-Remove-Window', 'i-Remove', 'i-Rename',
+            'i-Repair', 'i-Repeat-2', 'i-Repeat-3', 'i-Repeat-4', 'i-Repeat-5', 'i-Repeat-6',
+            'i-Repeat-7', 'i-Repeat', 'i-Reset', 'i-Resize', 'i-Restore-Window', 'i-Retouching',
+            'i-Retro-Camera', 'i-Retro', 'i-Retweet', 'i-Reverbnation', 'i-Rewind', 'i-RGB', 'i-Ribbon-2',
+            'i-Ribbon-3', 'i-Ribbon', 'i-Right-2', 'i-Right-3', 'i-Right-4', 'i-Right-ToLeft', 'i-Right',
+            'i-Road-2', 'i-Road-3', 'i-Road', 'i-Robot-2', 'i-Robot', 'i-Rock-andRoll', 'i-Rocket',
+            'i-Roller', 'i-Roof', 'i-Rook', 'i-Rotate-Gesture', 'i-Rotate-Gesture2', 'i-Rotate-Gesture3',
+            'i-Rotation-390', 'i-Rotation', 'i-Router-2', 'i-Router', 'i-RSS', 'i-Ruler-2', 'i-Ruler',
+            'i-Running-Shoes', 'i-Running', 'i-Safari', 'i-Safe-Box', 'i-Safe-Box2', 'i-Safety-PinClose',
+            'i-Safety-PinOpen', 'i-Sagittarus-2', 'i-Sagittarus', 'i-Sailing-Ship', 'i-Sand-watch',
+            'i-Sand-watch2', 'i-Santa-Claus', 'i-Santa-Claus2', 'i-Santa-onSled', 'i-Satelite-2',
+            'i-Satelite', 'i-Save-Window', 'i-Save', 'i-Saw', 'i-Saxophone', 'i-Scale', 'i-Scarf',
+            'i-Scissor', 'i-Scooter-Front', 'i-Scooter', 'i-Scorpio-2', 'i-Scorpio', 'i-Scotland',
+            'i-Screwdriver', 'i-Scroll-Fast', 'i-Scroll', 'i-Scroller-2', 'i-Scroller', 'i-Sea-Dog',
+            'i-Search-onCloud', 'i-Search-People', 'i-secound', 'i-secound2', 'i-Security-Block',
+            'i-Security-Bug', 'i-Security-Camera', 'i-Security-Check', 'i-Security-Settings',
+            'i-Security-Smiley', 'i-Securiy-Remove', 'i-Seed', 'i-Selfie', 'i-Serbia', 'i-Server-2',
+            'i-Server', 'i-Servers', 'i-Settings-Window', 'i-Sewing-Machine', 'i-Sexual', 'i-Share-onCloud',
+            'i-Share-Window', 'i-Share', 'i-Sharethis', 'i-Shark', 'i-Sheep', 'i-Sheriff-Badge',
+            'i-Shield', 'i-Ship-2', 'i-Ship', 'i-Shirt', 'i-Shoes-2', 'i-Shoes-3', 'i-Shoes', 'i-Shop-2',
+            'i-Shop-3', 'i-Shop-4', 'i-Shop', 'i-Shopping-Bag', 'i-Shopping-Basket', 'i-Shopping-Cart',
+            'i-Short-Pants', 'i-Shoutwire', 'i-Shovel', 'i-Shuffle-2', 'i-Shuffle-3', 'i-Shuffle-4',
+            'i-Shuffle', 'i-Shutter', 'i-Sidebar-Window', 'i-Signal', 'i-Singapore', 'i-Skate-Shoes',
+            'i-Skateboard-2', 'i-Skateboard', 'i-Skeleton', 'i-Ski', 'i-Skirt', 'i-Skrill', 'i-Skull',
+            'i-Skydiving', 'i-Skype', 'i-Sled-withGifts', 'i-Sled', 'i-Sleeping', 'i-Sleet', 'i-Slippers',
+            'i-Smart', 'i-Smartphone-2', 'i-Smartphone-3', 'i-Smartphone-4', 'i-Smartphone-Secure',
+            'i-Smartphone', 'i-Smile', 'i-Smoking-Area', 'i-Smoking-Pipe', 'i-Snake', 'i-Snorkel',
+            'i-Snow-2', 'i-Snow-Dome', 'i-Snow-Storm', 'i-Snow', 'i-Snowflake-2', 'i-Snowflake-3',
+            'i-Snowflake-4', 'i-Snowflake', 'i-Snowman', 'i-Soccer-Ball', 'i-Soccer-Shoes', 'i-Socks',
+            'i-Solar', 'i-Sound-Wave', 'i-Sound', 'i-Soundcloud', 'i-Soup', 'i-South-Africa',
+            'i-Space-Needle', 'i-Spain', 'i-Spam-Mail', 'i-Speach-Bubble', 'i-Speach-Bubble2',
+            'i-Speach-Bubble3', 'i-Speach-Bubble4', 'i-Speach-Bubble5', 'i-Speach-Bubble6',
+            'i-Speach-Bubble7', 'i-Speach-Bubble8', 'i-Speach-Bubble9', 'i-Speach-Bubble10',
+            'i-Speach-Bubble11', 'i-Speach-Bubble12', 'i-Speach-Bubble13', 'i-Speach-BubbleAsking',
+            'i-Speach-BubbleComic', 'i-Speach-BubbleComic2', 'i-Speach-BubbleComic3',
+            'i-Speach-BubbleComic4', 'i-Speach-BubbleDialog', 'i-Speach-Bubbles', 'i-Speak-2', 'i-Speak',
+            'i-Speaker-2', 'i-Speaker', 'i-Spell-Check', 'i-Spell-CheckABC', 'i-Spermium', 'i-Spider',
+            'i-Spiderweb', 'i-Split-FourSquareWindow', 'i-Split-Horizontal', 'i-Split-Horizontal2Window',
+            'i-Split-Vertical', 'i-Split-Vertical2', 'i-Split-Window', 'i-Spoder', 'i-Spoon',
+            'i-Sport-Mode', 'i-Sports-Clothings1', 'i-Sports-Clothings2', 'i-Sports-Shirt', 'i-Spot',
+            'i-Spray', 'i-Spread', 'i-Spring', 'i-Spurl', 'i-Spy', 'i-Squirrel', 'i-SSL',
+            'i-St-BasilsCathedral', 'i-St-PaulsCathedral', 'i-Stamp-2', 'i-Stamp', 'i-Stapler',
+            'i-Star-Track', 'i-Star', 'i-Starfish', 'i-Start2', 'i-Start-3', 'i-Start-ways', 'i-Start',
+            'i-Statistic', 'i-Stethoscope', 'i-stop--2', 'i-Stop-Music', 'i-Stop', 'i-Stopwatch-2',
+            'i-Stopwatch', 'i-Storm', 'i-Street-View', 'i-Street-View2', 'i-Strikethrough-Text',
+            'i-Stroller', 'i-Structure', 'i-Student-Female', 'i-Student-Hat', 'i-Student-Hat2',
+            'i-Student-Male', 'i-Student-MaleFemale', 'i-Students', 'i-Studio-Flash', 'i-Studio-Lightbox',
+            'i-Stumbleupon', 'i-Suit', 'i-Suitcase', 'i-Sum-2', 'i-Sum', 'i-Summer', 'i-Sun-CloudyRain',
+            'i-Sun', 'i-Sunglasses-2', 'i-Sunglasses-3', 'i-Sunglasses-Smiley', 'i-Sunglasses-Smiley2',
+            'i-Sunglasses-W', 'i-Sunglasses-W2', 'i-Sunglasses-W3', 'i-Sunglasses', 'i-Sunrise',
+            'i-Sunset', 'i-Superman', 'i-Support', 'i-Surprise', 'i-Sushi', 'i-Sweden', 'i-Swimming-Short',
+            'i-Swimming', 'i-Swimmwear', 'i-Switch', 'i-Switzerland', 'i-Sync-Cloud', 'i-Sync',
+            'i-Synchronize-2', 'i-Synchronize', 'i-T-Shirt', 'i-Tablet-2', 'i-Tablet-3',
+            'i-Tablet-Orientation', 'i-Tablet-Phone', 'i-Tablet-Secure', 'i-Tablet-Vertical', 'i-Tablet',
+            'i-Tactic', 'i-Tag-2', 'i-Tag-3', 'i-Tag-4', 'i-Tag-5', 'i-Tag', 'i-Taj-Mahal', 'i-Talk-Man',
+            'i-Tap', 'i-Target-Market', 'i-Target', 'i-Taurus-2', 'i-Taurus', 'i-Taxi-2', 'i-Taxi-Sign',
+            'i-Taxi', 'i-Teacher', 'i-Teapot', 'i-Technorati', 'i-Teddy-Bear', 'i-Tee-Mug',
+            'i-Telephone-2', 'i-Telephone', 'i-Telescope', 'i-Temperature-2', 'i-Temperature-3',
+            'i-Temperature', 'i-Temple', 'i-Tennis-Ball', 'i-Tennis', 'i-Tent', 'i-Test-Tube',
+            'i-Test-Tube2', 'i-Testimonal', 'i-Text-Box', 'i-Text-Effect', 'i-Text-HighlightColor',
+            'i-Text-Paragraph', 'i-Thailand', 'i-The-WhiteHouse', 'i-This-SideUp', 'i-Thread',
+            'i-Three-ArrowFork', 'i-Three-Fingers', 'i-Three-FingersDrag', 'i-Three-FingersDrag2',
+            'i-Three-FingersTouch', 'i-Thumb', 'i-Thumbs-DownSmiley', 'i-Thumbs-UpSmiley', 'i-Thunder',
+            'i-Thunderstorm', 'i-Ticket', 'i-Tie-2', 'i-Tie-3', 'i-Tie-4', 'i-Tie', 'i-Tiger',
+            'i-Time-Backup', 'i-Time-Bomb', 'i-Time-Clock', 'i-Time-Fire', 'i-Time-Machine',
+            'i-Time-Window', 'i-Timer-2', 'i-Timer', 'i-To-Bottom', 'i-To-Bottom2', 'i-To-Left',
+            'i-To-Right', 'i-To-Top', 'i-To-Top2', 'i-Token-', 'i-Tomato', 'i-Tongue', 'i-Tooth-2',
+            'i-Tooth', 'i-Top-ToBottom', 'i-Touch-Window', 'i-Tourch', 'i-Tower-2', 'i-Tower-Bridge',
+            'i-Tower', 'i-Trace', 'i-Tractor', 'i-traffic-Light', 'i-Traffic-Light2', 'i-Train-2',
+            'i-Train', 'i-Tram', 'i-Transform-2', 'i-Transform-3', 'i-Transform-4', 'i-Transform',
+            'i-Trash-withMen', 'i-Tree-2', 'i-Tree-3', 'i-Tree-4', 'i-Tree-5', 'i-Tree', 'i-Trekking',
+            'i-Triangle-ArrowDown', 'i-Triangle-ArrowLeft', 'i-Triangle-ArrowRight',
+            'i-Triangle-ArrowUp', 'i-Tripod-2', 'i-Tripod-andVideo', 'i-Tripod-withCamera',
+            'i-Tripod-withGopro', 'i-Trophy-2', 'i-Trophy', 'i-Truck', 'i-Trumpet', 'i-Tumblr',
+            'i-Turkey', 'i-Turn-Down', 'i-Turn-Down2', 'i-Turn-DownFromLeft', 'i-Turn-DownFromRight',
+            'i-Turn-Left', 'i-Turn-Left3', 'i-Turn-Right', 'i-Turn-Right3', 'i-Turn-Up', 'i-Turn-Up2',
+            'i-Turtle', 'i-Tuxedo', 'i-TV', 'i-Twister', 'i-Twitter-2', 'i-Twitter', 'i-Two-Fingers',
+            'i-Two-FingersDrag', 'i-Two-FingersDrag2', 'i-Two-FingersScroll', 'i-Two-FingersTouch',
+            'i-Two-Windows', 'i-Type-Pass', 'i-Ukraine', 'i-Umbrela', 'i-Umbrella-2', 'i-Umbrella-3',
+            'i-Under-LineText', 'i-Undo', 'i-United-Kingdom', 'i-United-States', 'i-University-2',
+            'i-University', 'i-Unlike-2', 'i-Unlike', 'i-Unlock-2', 'i-Unlock-3', 'i-Unlock', 'i-Up--Down',
+            'i-Up--Down3', 'i-Up-2', 'i-Up-3', 'i-Up-4', 'i-Up', 'i-Upgrade', 'i-Upload-2',
+            'i-Upload-toCloud', 'i-Upload-Window', 'i-Upload', 'i-Uppercase-Text', 'i-Upward',
+            'i-URL-Window', 'i-Usb-2', 'i-Usb-Cable', 'i-Usb', 'i-User', 'i-Ustream', 'i-Vase',
+            'i-Vector-2', 'i-Vector-3', 'i-Vector-4', 'i-Vector-5', 'i-Vector', 'i-Venn-Diagram',
+            'i-Vest-2', 'i-Vest', 'i-Viddler', 'i-Video-2', 'i-Video-3', 'i-Video-4', 'i-Video-5',
+            'i-Video-6', 'i-Video-GameController', 'i-Video-Len', 'i-Video-Len2', 'i-Video-Photographer',
+            'i-Video-Tripod', 'i-Video', 'i-Vietnam', 'i-View-Height', 'i-View-Width', 'i-Vimeo',
+            'i-Virgo-2', 'i-Virgo', 'i-Virus-2', 'i-Virus-3', 'i-Virus', 'i-Visa', 'i-Voice',
+            'i-Voicemail', 'i-Volleyball', 'i-Volume-Down', 'i-Volume-Up', 'i-VPN', 'i-Wacom-Tablet',
+            'i-Waiter', 'i-Walkie-Talkie', 'i-Wallet-2', 'i-Wallet-3', 'i-Wallet', 'i-Warehouse',
+            'i-Warning-Window', 'i-Watch-2', 'i-Watch-3', 'i-Watch', 'i-Wave-2', 'i-Wave', 'i-Webcam',
+            'i-weight-Lift', 'i-Wheelbarrow', 'i-Wheelchair', 'i-Width-Window', 'i-Wifi-2',
+            'i-Wifi-Keyboard', 'i-Wifi', 'i-Wind-Turbine', 'i-Windmill', 'i-Window-2', 'i-Window',
+            'i-Windows-2', 'i-Windows-Microsoft', 'i-Windows', 'i-Windsock', 'i-Windy', 'i-Wine-Bottle',
+            'i-Wine-Glass', 'i-Wink', 'i-Winter-2', 'i-Winter', 'i-Wireless', 'i-Witch-Hat', 'i-Witch',
+            'i-Wizard', 'i-Wolf', 'i-Woman-Sign', 'i-WomanMan', 'i-Womans-Underwear', 'i-Womans-Underwear2',
+            'i-Women', 'i-Wonder-Woman', 'i-Wordpress', 'i-Worker-Clothes', 'i-Worker', 'i-Wrap-Text',
+            'i-Wreath', 'i-Wrench', 'i-X-Box', 'i-X-ray', 'i-Xanga', 'i-Xing', 'i-Yacht', 'i-Yahoo-Buzz',
+            'i-Yahoo', 'i-Yelp', 'i-Yes', 'i-Ying-Yang', 'i-Youtube', 'i-Z-A', 'i-Zebra', 'i-Zombie',
+            'i-Zoom-Gesture', 'i-Zootool'
+        ];
+
+        // Get the container element
+        const iconsContainer = document.getElementById('icons-container');
+
+        // Create HTML for all icons
+        iconClasses.forEach(iconClass => {
+            const iconElement = document.createElement('span');
+            iconElement.className = 'box1';
+            iconElement.innerHTML = `
+                <i aria-hidden="true" class="${iconClass}"></i>
+            `;
+            iconElement.addEventListener('click', () => showIconDetails(iconClass));
+            iconsContainer.appendChild(iconElement);
+        });
+
+        // Get the modal element
+        const modal = document.getElementById('iconModal');
+        const closeBtn = document.querySelector('.close');
+
+        // Function to show icon details in modal
+        function showIconDetails(iconClass) {
+            const iconElement = document.querySelector(`.${iconClass}`);
+            let unicode = getComputedStyle(iconElement, ':before').content;
+            
+            document.getElementById('modalIcon').innerHTML = '<i aria-hidden="true" class="'+iconElement.className+'"></i>';
+            document.getElementById('iconName').textContent = iconClass.replace('i-', '').replace(/-/g, ' ');
+            document.getElementById('iconClass').textContent = iconClass;
+			
+			unicode = unicode.replace(/['"\\]/g, '').charCodeAt(0).toString(16).toUpperCase();
+            document.getElementById('iconUnicode').textContent = `\\${unicode}`;
+            
+            modal.style.display = 'block';
+        }
+
+        // Close modal when clicking X
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
