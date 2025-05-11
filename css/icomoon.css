@@ -1,9 +1,9 @@
 @font-face {
 	font-family: 'icomoon';
-	src:url(/fonts/icomoon.eot?5a93ca370c17dfa3cb9d26d5f993716b);
-	src:url(/fonts/icomoon.eot?5a93ca370c17dfa3cb9d26d5f993716b?#iefix-rdmvgc) format('embedded-opentype'),
-		url(/fonts/icomoon.woff?2864469c0e8a84417f318ee2cac54b04) format('woff'),
-		url(/fonts/icomoon.ttf?f0409337cef4caa891f01a833caf73d0) format('truetype')
+	src:url(../fonts/icomoon.eot?5a93ca370c17dfa3cb9d26d5f993716b);
+	src:url(../fonts/icomoon.eot?5a93ca370c17dfa3cb9d26d5f993716b?#iefix-rdmvgc) format('embedded-opentype'),
+		url(../fonts/icomoon.woff?2864469c0e8a84417f318ee2cac54b04) format('woff'),
+		url(../fonts/icomoon.ttf?f0409337cef4caa891f01a833caf73d0) format('truetype')
 		;
 	font-weight: normal;
 	font-style: normal;
